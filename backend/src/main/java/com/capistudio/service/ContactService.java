@@ -1,24 +1,20 @@
 package com.capistudio.service;
 
-import com.capistudio.dto.ContactRequest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.capistudio.domain.NewContactSubmission;
+import com.capistudio.repository.ContactSubmissionRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ContactService {
+public class ContactService implements ContactSubmissionService {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final ContactSubmissionRepository contactSubmissionRepository;
 
-    public ContactService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ContactService(ContactSubmissionRepository contactSubmissionRepository) {
+        this.contactSubmissionRepository = contactSubmissionRepository;
     }
 
-    public void saveSubmission(ContactRequest request) {
-        jdbcTemplate.update(
-                "INSERT INTO contact_submissions (name, email, message) VALUES (?, ?, ?)",
-                request.name(),
-                request.email(),
-                request.message()
-        );
+    @Override
+    public void saveSubmission(NewContactSubmission submission) {
+        contactSubmissionRepository.save(submission);
     }
 }

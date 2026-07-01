@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { isAllowedAdminEmail } from "../lib/admin";
+import { validateAdminSession } from "../lib/adminAuthorization";
 import { supabase } from "../lib/supabase";
 
 type AuthContextValue = {
@@ -21,20 +22,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-async function validateSession(session: Session | null): Promise<Session | null> {
-  if (!session) return null;
-
-  const email = session.user.email;
-  if (!isAllowedAdminEmail(email)) {
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
-    throw new Error("Acesso restrito a administradores autorizados.");
-  }
-
-  return session;
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -52,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       try {
-        const valid = await validateSession(current);
+        const valid = await validateAdminSession(current);
         setSession(valid);
       } catch {
         setSession(null);
@@ -67,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       try {
-        const valid = await validateSession(nextSession);
+        const valid = await validateAdminSession(nextSession);
         setSession(valid);
       } catch {
         setSession(null);
@@ -113,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error) throw error;
 
-    const valid = await validateSession(data.session);
+    const valid = await validateAdminSession(data.session);
     setSession(valid);
   }, []);
 

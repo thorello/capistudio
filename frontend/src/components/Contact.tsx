@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { submitContact } from "../lib/api";
+import { submitContact } from "../lib/contactApi";
 import "./Contact.css";
 
 const CONTACT_EMAIL = "morello@capistudio.com";

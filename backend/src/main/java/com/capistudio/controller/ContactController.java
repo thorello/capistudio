@@ -2,7 +2,8 @@ package com.capistudio.controller;
 
 import com.capistudio.dto.ContactRequest;
 import com.capistudio.dto.ContactResponse;
-import com.capistudio.service.ContactService;
+import com.capistudio.mapper.ContactRequestMapper;
+import com.capistudio.service.ContactSubmissionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,18 +15,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ContactController {
 
-    private final ContactService contactService;
+    private static final String SUCCESS_MESSAGE =
+            "Mensagem recebida com sucesso. Entraremos em contato em breve.";
 
-    public ContactController(ContactService contactService) {
-        this.contactService = contactService;
+    private final ContactSubmissionService contactSubmissionService;
+    private final ContactRequestMapper contactRequestMapper;
+
+    public ContactController(
+            ContactSubmissionService contactSubmissionService,
+            ContactRequestMapper contactRequestMapper
+    ) {
+        this.contactSubmissionService = contactSubmissionService;
+        this.contactRequestMapper = contactRequestMapper;
     }
 
     @PostMapping("/contact")
     public ResponseEntity<ContactResponse> submitContact(@Valid @RequestBody ContactRequest request) {
-        contactService.saveSubmission(request);
-        return ResponseEntity.ok(new ContactResponse(
-                "success",
-                "Mensagem recebida com sucesso. Entraremos em contato em breve."
-        ));
+        contactSubmissionService.saveSubmission(contactRequestMapper.toDomain(request));
+        return ResponseEntity.ok(new ContactResponse("success", SUCCESS_MESSAGE));
     }
 }

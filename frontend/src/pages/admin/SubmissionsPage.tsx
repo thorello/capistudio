@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getContactSubmissions, type ContactSubmission } from "../../lib/api";
+import { getContactSubmissions, type ContactSubmission } from "../../lib/submissionsRepository";
 import "./SubmissionsPage.css";
 
 function formatDate(iso: string): string {
