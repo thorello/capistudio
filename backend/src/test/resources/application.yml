@@ -8,3 +8,15 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema-test.sql
+
+otel:
+  traces:
+    exporter: none
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
+
+management:
+  tracing:
+    enabled: false
