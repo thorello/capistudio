@@ -118,6 +118,17 @@ docker compose up -d
 
    O workflow `Deploy` **falha** se algum secret estiver ausente (evita falso positivo de deploy).
 
+5. **Roteamento SPA** (`/admin`, etc.): o static site precisa de uma regra de rewrite.
+   Se `/admin` retornar 404, configure no Render:
+   - **Dashboard** → `capistudio-web` → **Redirects/Rewrites** → Add Rule:
+     - Source: `/*` | Destination: `/index.html` | Action: **Rewrite**
+   - Ou via script (uma vez):
+     ```powershell
+     $env:RENDER_API_KEY = "rnd_..."
+     .\scripts\configure-render-spa.ps1
+     ```
+   - Ou adicione o secret `RENDER_API_KEY` no GitHub — o workflow Deploy aplica automaticamente.
+
 ## DNS (capistudio.com)
 
 O `render.yaml` já declara os domínios customizados (`capistudio.com` e `api.capistudio.com`). Após sincronizar o Blueprint no Render, configure o DNS no registrador.

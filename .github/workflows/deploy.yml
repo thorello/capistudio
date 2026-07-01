@@ -29,3 +29,26 @@ jobs:
           fi
           curl -fsS -X POST "$DEPLOY_HOOK"
           echo "Deploy do frontend acionado."
+
+      - name: Garantir rewrite SPA no Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "RENDER_API_KEY não configurado — pule este passo ou configure manualmente no Render."
+            exit 0
+          fi
+          SERVICE_ID=$(curl -fsS -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Accept: application/json" \
+            "https://api.render.com/v1/services?limit=100" \
+            | jq -r '.[] | select(.service.name=="capistudio-web") | .service.id')
+          if [ -z "$SERVICE_ID" ] || [ "$SERVICE_ID" = "null" ]; then
+            echo "::warning::Serviço capistudio-web não encontrado."
+            exit 0
+          fi
+          curl -fsS -X PUT \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '[{"type":"rewrite","source":"/*","destination":"/index.html"}]' \
+            "https://api.render.com/v1/services/${SERVICE_ID}/routes"
+          echo "Rewrite SPA aplicado: /* → /index.html"
