@@ -95,15 +95,42 @@ docker compose up -d
 
 ## DNS (capistudio.com)
 
-No registrador do domínio, configure:
+O `render.yaml` já declara os domínios customizados (`capistudio.com` e `api.capistudio.com`). Após sincronizar o Blueprint no Render, configure o DNS no registrador.
 
-| Registro | Tipo | Destino |
-|----------|------|---------|
-| `@` (root) | CNAME | `capistudio-web.onrender.com` |
-| `www` | CNAME | `capistudio-web.onrender.com` |
-| `api` | CNAME | `capistudio-api.onrender.com` |
+### Hostinger (hPanel)
 
-No Render, associe `capistudio.com` ao serviço **capistudio-web** e `api.capistudio.com` ao **capistudio-api**.
+Acesse **hPanel → Domains → capistudio.com → DNS / Nameservers → DNS records**.
+
+**Remova** registros conflitantes antes de adicionar os novos:
+- Registro **A** de `@` apontando para IP antigo (ex.: `2.57.91.91`)
+- **CNAME** ou **A** de `www` com destino antigo
+- Registros **AAAA** (IPv6), se existirem
+
+> A Hostinger não suporta CNAME/ALIAS no apex (`@`). Use registro **A** com o IP do load balancer do Render.
+
+| Registro | Tipo | Name | Destino |
+|----------|------|------|---------|
+| Apex | **A** | `@` | `216.24.57.1` |
+| WWW | **CNAME** | `www` | `capistudio-web.onrender.com` |
+| API | **CNAME** | `api` | `capistudio-api.onrender.com` |
+
+Confirme o IP exato no painel do Render ao adicionar o domínio customizado (Settings → Custom Domains).
+
+O Render adiciona automaticamente `www.capistudio.com` com redirect para o apex ao configurar `capistudio.com`.
+
+### Verificação
+
+```powershell
+.\scripts\setup-domains.ps1
+```
+
+Com API keys opcionais, o script também configura Render e Supabase:
+
+```powershell
+$env:RENDER_API_KEY = "rnd_..."
+$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+.\scripts\setup-domains.ps1
+```
 
 ## OpenTelemetry
 

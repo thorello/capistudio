@@ -7,6 +7,8 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     healthCheckPath: /actuator/health
+    domains:
+      - api.capistudio.com
     envVars:
       - key: OTEL_SERVICE_NAME
         value: capistudio-api
@@ -28,6 +30,8 @@ services:
     plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
+    domains:
+      - capistudio.com
     envVars:
       - key: VITE_API_URL
         value: https://api.capistudio.com

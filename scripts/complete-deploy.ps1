@@ -79,4 +79,16 @@ foreach ($payload in @($apiBody, $webBody)) {
     Invoke-RestMethod -Uri "https://api.render.com/v1/services" -Method POST -Headers $renderHeaders -Body $payload | Out-Null
 }
 
-Write-Host "Deploy concluido. Verifique https://dashboard.render.com"
+Start-Sleep -Seconds 5
+$services = Invoke-RestMethod -Uri "https://api.render.com/v1/services?limit=100" -Headers $renderHeaders
+foreach ($entry in $services) {
+  $svc = $entry.service
+  if ($svc.name -eq "capistudio-web") {
+    Invoke-RestMethod -Uri "https://api.render.com/v1/services/$($svc.id)/custom-domains" -Method POST -Headers $renderHeaders -Body '{"name":"capistudio.com"}' -ErrorAction SilentlyContinue | Out-Null
+  }
+  if ($svc.name -eq "capistudio-api") {
+    Invoke-RestMethod -Uri "https://api.render.com/v1/services/$($svc.id)/custom-domains" -Method POST -Headers $renderHeaders -Body '{"name":"api.capistudio.com"}' -ErrorAction SilentlyContinue | Out-Null
+  }
+}
+
+Write-Host "Deploy concluido. Configure DNS na Hostinger: .\scripts\setup-domains.ps1"
