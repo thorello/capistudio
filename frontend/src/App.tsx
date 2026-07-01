@@ -1,25 +1,27 @@
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
-import { Services } from "./components/Services";
-import { Portfolio } from "./components/Portfolio";
-import { Testimonials } from "./components/Testimonials";
-import { Contact } from "./components/Contact";
-import { Footer } from "./components/Footer";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./components/admin/ProtectedRoute";
+import { LandingPage } from "./pages/LandingPage";
+import { AdminPage } from "./pages/admin/AdminPage";
+import { LoginPage } from "./pages/admin/LoginPage";
 import "./styles/global.css";
 
 function App() {
   return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <Services />
-        <Portfolio />
-        <Testimonials />
-        <Contact />
-      </main>
-      <Footer />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin/login" element={<LoginPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
