@@ -76,7 +76,7 @@ function Update-SupabaseAuthUrls {
     }
     $body = @{
         site_url = "https://$Domain"
-        uri_allow_list = "https://$Domain,https://www.$Domain"
+        uri_allow_list = "https://$Domain,https://www.$Domain,https://$Domain/admin,https://www.$Domain/admin"
     } | ConvertTo-Json
     Invoke-RestMethod -Uri "https://api.supabase.com/v1/projects/$SupabaseProjectRef/config/auth" `
         -Method PATCH -Headers $headers -Body $body | Out-Null
@@ -139,7 +139,8 @@ if ($env:SUPABASE_ACCESS_TOKEN) {
     Write-Host "SUPABASE_ACCESS_TOKEN nao definida - confirme manualmente no Supabase Dashboard:" -ForegroundColor Yellow
     Write-Host "  Authentication -> URL Configuration"
     Write-Host "  Site URL: https://$Domain"
-    Write-Host "  Redirect URLs: https://$Domain, https://www.$Domain"
+    Write-Host "  Redirect URLs: https://$Domain, https://www.$Domain, https://$Domain/admin"
+    Write-Host "  Authentication -> Providers -> Google: habilite e configure Client ID/Secret"
 }
 
 # --- Hostinger DNS instructions ---

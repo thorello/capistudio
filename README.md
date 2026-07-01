@@ -129,6 +129,45 @@ docker compose up -d
      ```
    - Ou adicione o secret `RENDER_API_KEY` no GitHub — o workflow Deploy aplica automaticamente.
 
+## Login Google (Admin)
+
+O erro `Unsupported provider: provider is not enabled` significa que o **Google OAuth não está habilitado** no Supabase.
+
+### 1. Google Cloud Console
+
+1. Abra [console.cloud.google.com](https://console.cloud.google.com) → **APIs & Services** → **Credentials**
+2. **Create Credentials** → **OAuth client ID** → tipo **Web application**
+3. **Authorized JavaScript origins:**
+   - `https://capistudio.com`
+   - `http://localhost:5173` (dev)
+4. **Authorized redirect URIs** (copie do Supabase no passo 2):
+   - `https://fdxbvjocdhrkzraepmwi.supabase.co/auth/v1/callback`
+5. Salve o **Client ID** e **Client Secret**
+
+### 2. Supabase Dashboard
+
+1. [app.supabase.com](https://app.supabase.com) → projeto **capistudio**
+2. **Authentication** → **Providers** → **Google**
+3. Ative **Enable Sign in with Google**
+4. Cole **Client ID** e **Client Secret** do Google Cloud
+5. **Save**
+
+### 3. URLs de redirect (Authentication → URL Configuration)
+
+| Campo | Valor |
+|-------|-------|
+| Site URL | `https://capistudio.com` |
+| Redirect URLs | `https://capistudio.com/admin`, `https://www.capistudio.com/admin`, `http://localhost:5173/admin` |
+
+### 4. Restrição de acesso
+
+Só estes e-mails podem entrar no admin (definidos em `frontend/src/lib/admin.ts`):
+
+- `thiagosiqueiramorello@gmail.com`
+- `morello@capistudio.com`
+
+O usuário precisa existir no Supabase (**Authentication → Users**) ou fazer login via Google com um desses e-mails.
+
 ## DNS (capistudio.com)
 
 O `render.yaml` já declara os domínios customizados (`capistudio.com` e `api.capistudio.com`). Após sincronizar o Blueprint no Render, configure o DNS no registrador.

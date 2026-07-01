@@ -42,3 +42,11 @@ enable_signup = false
 enable_signup = false
 double_confirm_changes = true
 enable_confirmations = false
+
+# Google OAuth — produção: configure no Supabase Dashboard (Authentication > Providers > Google).
+# Local: defina GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no .env e habilite abaixo.
+# [auth.external.google]
+# enabled = true
+# client_id = "env(GOOGLE_CLIENT_ID)"
+# secret = "env(GOOGLE_CLIENT_SECRET)"
+# skip_nonce_check = false
