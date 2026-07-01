@@ -14,6 +14,8 @@ backend/target/
 # Cursor internal
 canvases/
 mcps/
+agent-tools/
+terminals/
 
 # IDE
 .idea/
