@@ -6,6 +6,9 @@ spring:
     username: ${SUPABASE_DB_USER:}
     password: ${SUPABASE_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      initialization-fail-timeout: -1
   sql:
     init:
       mode: never
@@ -21,6 +24,9 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+  health:
+    db:
+      enabled: false
 
 app:
   cors:
