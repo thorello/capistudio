@@ -1,0 +1,117 @@
+.admin-back-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.submissions-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: var(--text-secondary);
+}
+
+.submissions-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--gradient-start);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.submissions-error {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.submissions-empty {
+  padding: 3rem 0;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.submissions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.submission-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.submission-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.submission-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.submission-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.submission-email {
+  font-size: 0.875rem;
+  color: var(--gradient-mid);
+}
+
+.submission-email:hover {
+  text-decoration: underline;
+}
+
+.submission-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.submission-message {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.submission-message--truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.submission-expand {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--gradient-mid);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.submission-expand:hover {
+  text-decoration: underline;
+}

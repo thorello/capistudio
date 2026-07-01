@@ -3,6 +3,7 @@ import { ProtectedRoute } from "./components/admin/ProtectedRoute";
 import { LandingPage } from "./pages/LandingPage";
 import { AdminPage } from "./pages/admin/AdminPage";
 import { LoginPage } from "./pages/admin/LoginPage";
+import { SubmissionsPage } from "./pages/admin/SubmissionsPage";
 import "./styles/global.css";
 
 function App() {
@@ -16,6 +17,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/submissions"
+          element={
+            <ProtectedRoute>
+              <SubmissionsPage />
             </ProtectedRoute>
           }
         />

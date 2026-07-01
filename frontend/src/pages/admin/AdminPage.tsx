@@ -3,10 +3,30 @@ import { useAuth } from "../../contexts/AuthContext";
 import "./AdminPage.css";
 
 const menuItems = [
-  { label: "Mensagens de contato", description: "Visualizar formulários recebidos", href: "#" },
-  { label: "Portfólio", description: "Gerenciar projetos exibidos no site", href: "#" },
-  { label: "Depoimentos", description: "Editar avaliações de clientes", href: "#" },
-  { label: "Configurações", description: "Preferências do site", href: "#" },
+  {
+    label: "Mensagens de contato",
+    description: "Visualizar formulários recebidos",
+    href: "/admin/submissions",
+    active: true,
+  },
+  {
+    label: "Portfólio",
+    description: "Gerenciar projetos exibidos no site",
+    href: "#",
+    active: false,
+  },
+  {
+    label: "Depoimentos",
+    description: "Editar avaliações de clientes",
+    href: "#",
+    active: false,
+  },
+  {
+    label: "Configurações",
+    description: "Preferências do site",
+    href: "#",
+    active: false,
+  },
 ];
 
 export function AdminPage() {
@@ -23,7 +43,11 @@ export function AdminPage() {
 
           <div className="admin-header-actions">
             <span className="admin-user-email">{user?.email}</span>
-            <button type="button" className="btn btn-secondary admin-logout" onClick={() => signOut()}>
+            <button
+              type="button"
+              className="btn btn-secondary admin-logout"
+              onClick={() => signOut()}
+            >
               Sair
             </button>
           </div>
@@ -37,12 +61,30 @@ export function AdminPage() {
         </div>
 
         <nav className="admin-menu grid-2" aria-label="Menu administrativo">
-          {menuItems.map((item) => (
-            <a key={item.label} href={item.href} className="admin-menu-item card">
-              <h2>{item.label}</h2>
-              <p>{item.description}</p>
-            </a>
-          ))}
+          {menuItems.map((item) =>
+            item.active ? (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="admin-menu-item admin-menu-item--active card"
+              >
+                <h2>{item.label}</h2>
+                <p>{item.description}</p>
+              </Link>
+            ) : (
+              <div
+                key={item.label}
+                className="admin-menu-item admin-menu-item--soon card"
+                aria-disabled="true"
+              >
+                <h2>
+                  {item.label}
+                  <span className="admin-menu-badge">Em breve</span>
+                </h2>
+                <p>{item.description}</p>
+              </div>
+            )
+          )}
         </nav>
 
         <p className="admin-footer-note">
