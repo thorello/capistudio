@@ -4,6 +4,9 @@ Landing page e API da **Capi Studio** — estúdio de desenvolvimento de jogos e
 
 **Domínio:** [capistudio.com](https://capistudio.com)
 
+> **Guia completo de setup e deploy → [docs/GUIA-SETUP-DEPLOY.md](docs/GUIA-SETUP-DEPLOY.md)**  
+> Playbook reutilizável com checklist, DNS, Render, Supabase, CI/CD, OAuth e troubleshooting.
+
 ## Stack
 
 | Camada | Tecnologia |
@@ -21,15 +24,15 @@ Landing page e API da **Capi Studio** — estúdio de desenvolvimento de jogos e
 ├── frontend/          # Landing page React
 ├── backend/           # API Spring Boot
 ├── supabase/          # Migrations e config
+├── docs/              # Guia de setup e deploy
 ├── .github/workflows/ # CI/CD
 └── render.yaml        # Blueprint Render
 ```
 
 ## Pré-requisitos
 
-- Node.js 20+
+- Node.js 22+
 - Java 21
-- Maven 3.9+
 - Conta [Supabase](https://supabase.com)
 - Conta [Render](https://render.com)
 
@@ -45,7 +48,7 @@ Preencha as credenciais do Supabase e ajuste `VITE_API_URL` para `http://localho
 
 ### 2. Banco de dados (Supabase)
 
-Execute a migration em `supabase/migrations/001_contact_submissions.sql` no SQL Editor do Supabase, ou use a CLI:
+Execute as migrations em `supabase/migrations/` no SQL Editor do Supabase, ou use a CLI:
 
 ```bash
 supabase db push
@@ -68,9 +71,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-API disponível em [http://localhost:8080](http://localhost:8080).
-
-Health check: `GET /actuator/health`
+API disponível em [http://localhost:8080](http://localhost:8080). Health check: `GET /actuator/health`
 
 ### 5. Postgres local (opcional)
 
@@ -78,151 +79,20 @@ Health check: `GET /actuator/health`
 docker compose up -d
 ```
 
-## Deploy no Render
+## Deploy e produção
 
-1. Crie um repositório no GitHub e faça push deste projeto
-2. No Render, crie um **Blueprint** apontando para o `render.yaml`
-3. Configure as variáveis secretas no dashboard:
-   - `SUPABASE_DB_URL` — connection string JDBC do Supabase
-   - `SUPABASE_DB_USER` — usuário do banco
-   - `SUPABASE_DB_PASSWORD` — senha do banco
-   - `VITE_SUPABASE_URL` — URL do projeto Supabase
-   - `VITE_SUPABASE_ANON_KEY` — chave anon do Supabase
-   - `OTEL_EXPORTER_OTLP_ENDPOINT` — endpoint OTLP (opcional)
-4. Crie **Deploy Hooks** para cada serviço e adicione como secrets no GitHub:
-   - `RENDER_DEPLOY_HOOK_API`
-   - `RENDER_DEPLOY_HOOK_WEB`
+Para deploy no Render, DNS, GitHub Actions, Google OAuth, rewrite SPA e demais configurações, siga o **[Guia completo de setup e deploy](docs/GUIA-SETUP-DEPLOY.md)**.
 
-   **Passo a passo (Render):**
-   1. Abra [Render Dashboard](https://dashboard.render.com)
-   2. Clique em `capistudio-api` → **Settings** → **Deploy Hook**
-   3. Se não houver hook, clique em **Create Deploy Hook** e copie a URL (`https://api.render.com/deploy/srv-...`)
-   4. Repita para `capistudio-web`
+Resumo rápido:
 
-   **Passo a passo (GitHub):**
-   1. Abra [Secrets do repositório](https://github.com/thorello/capistudio/settings/secrets/actions)
-   2. **New repository secret** → nome `RENDER_DEPLOY_HOOK_API` → cole a URL da API
-   3. **New repository secret** → nome `RENDER_DEPLOY_HOOK_WEB` → cole a URL do frontend
+1. Push para GitHub e sincronize o Blueprint Render (`render.yaml`)
+2. Configure secrets no Render e no GitHub (`RENDER_DEPLOY_HOOK_*`)
+3. Aplique migrations Supabase e configure auth
+4. Configure DNS (apex, www, api)
+5. Verifique `/admin` e health check da API
 
-   **Script auxiliar (Windows):**
-   ```powershell
-   .\scripts\setup-render-hooks.ps1
-   ```
-   Com `GITHUB_TOKEN` e URLs definidas, grava os secrets automaticamente:
-   ```powershell
-   $env:RENDER_DEPLOY_HOOK_API = "https://api.render.com/deploy/srv-..."
-   $env:RENDER_DEPLOY_HOOK_WEB = "https://api.render.com/deploy/srv-..."
-   $env:GITHUB_TOKEN = "ghp_..."
-   .\scripts\setup-render-hooks.ps1 -Apply
-   ```
-
-   O workflow `Deploy` **falha** se algum secret estiver ausente (evita falso positivo de deploy).
-
-5. **Roteamento SPA** (`/admin`, etc.): o static site precisa de uma regra de rewrite.
-   Se `/admin` retornar 404, configure no Render:
-   - **Dashboard** → `capistudio-web` → **Redirects/Rewrites** → Add Rule:
-     - Source: `/*` | Destination: `/index.html` | Action: **Rewrite**
-   - Ou via script (uma vez):
-     ```powershell
-     $env:RENDER_API_KEY = "rnd_..."
-     .\scripts\configure-render-spa.ps1
-     ```
-   - Ou adicione o secret `RENDER_API_KEY` no GitHub — o workflow Deploy aplica automaticamente.
-
-## Login Google (Admin)
-
-O erro `Unsupported provider: provider is not enabled` significa que o **Google OAuth não está habilitado** no Supabase.
-
-### 1. Google Cloud Console
-
-1. Abra [console.cloud.google.com](https://console.cloud.google.com) → **APIs & Services** → **Credentials**
-2. **Create Credentials** → **OAuth client ID** → tipo **Web application**
-3. **Authorized JavaScript origins:**
-   - `https://capistudio.com`
-   - `http://localhost:5173` (dev)
-4. **Authorized redirect URIs** (copie do Supabase no passo 2):
-   - `https://fdxbvjocdhrkzraepmwi.supabase.co/auth/v1/callback`
-5. Salve o **Client ID** e **Client Secret**
-
-### 2. Supabase Dashboard
-
-1. [app.supabase.com](https://app.supabase.com) → projeto **capistudio**
-2. **Authentication** → **Providers** → **Google**
-3. Ative **Enable Sign in with Google**
-4. Cole **Client ID** e **Client Secret** do Google Cloud
-5. **Save**
-
-### 3. URLs de redirect (Authentication → URL Configuration)
-
-| Campo | Valor |
-|-------|-------|
-| Site URL | `https://capistudio.com` |
-| Redirect URLs | `https://capistudio.com/admin`, `https://www.capistudio.com/admin`, `http://localhost:5173/admin` |
-
-### 4. Restrição de acesso
-
-Só estes e-mails podem entrar no admin (definidos em `frontend/src/lib/admin.ts`):
-
-- `thiagosiqueiramorello@gmail.com`
-- `morello@capistudio.com`
-
-O usuário precisa existir no Supabase (**Authentication → Users**) ou fazer login via Google com um desses e-mails.
-
-## DNS (capistudio.com)
-
-O `render.yaml` já declara os domínios customizados (`capistudio.com` e `api.capistudio.com`). Após sincronizar o Blueprint no Render, configure o DNS no registrador.
-
-### Hostinger (hPanel)
-
-Acesse **hPanel → Domains → capistudio.com → DNS / Nameservers → DNS records**.
-
-**Remova** registros conflitantes antes de adicionar os novos:
-- Registro **A** de `@` apontando para IP antigo (ex.: `2.57.91.91`)
-- **CNAME** ou **A** de `www` com destino antigo
-- Registros **AAAA** (IPv6), se existirem
-
-> A Hostinger não suporta CNAME/ALIAS no apex (`@`). Use registro **A** com o IP do load balancer do Render.
-
-| Registro | Tipo | Name | Destino |
-|----------|------|------|---------|
-| Apex | **A** | `@` | `216.24.57.1` |
-| WWW | **CNAME** | `www` | `capistudio-web.onrender.com` |
-| API | **CNAME** | `api` | `capistudio-api.onrender.com` |
-
-Confirme o IP exato no painel do Render ao adicionar o domínio customizado (Settings → Custom Domains).
-
-O Render adiciona automaticamente `www.capistudio.com` com redirect para o apex ao configurar `capistudio.com`.
-
-### Verificação
-
-```powershell
-.\scripts\setup-domains.ps1
-```
-
-Com API keys opcionais, o script também configura Render e Supabase:
-
-```powershell
-$env:RENDER_API_KEY = "rnd_..."
-$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
-.\scripts\setup-domains.ps1
-```
-
-## OpenTelemetry
-
-O backend exporta traces via OTLP. Configure no Render:
-
-```
-OTEL_SERVICE_NAME=capistudio-api
-OTEL_EXPORTER_OTLP_ENDPOINT=https://seu-coletor:4318
-OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-```
-
-Compatível com Grafana Cloud, Honeycomb, Jaeger e outros backends OTLP.
+Scripts auxiliares em `scripts/` (detalhes no guia).
 
 ## Contato
 
 - E-mail: [morello@capistudio.com](mailto:morello@capistudio.com)
-
-## Logo
-
-Substitua `frontend/public/logo.svg` pelo arquivo PNG original do logo, se preferir. Atualize as referências nos componentes de `logo.svg` para `logo.png`.
