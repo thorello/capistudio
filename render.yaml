@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: capistudio-api
+    runtime: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: OTEL_SERVICE_NAME
+        value: capistudio-api
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://capistudio.com,https://www.capistudio.com
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SUPABASE_DB_USER
+        sync: false
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+
+  - type: web
+    name: capistudio-web
+    runtime: static
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://api.capistudio.com
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600

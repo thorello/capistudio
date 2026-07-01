@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build
+frontend/dist/
+backend/target/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Cursor internal
+canvases/
+mcps/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+
+# Maven wrapper (keep wrapper jar)
+!backend/.mvn/wrapper/maven-wrapper.jar

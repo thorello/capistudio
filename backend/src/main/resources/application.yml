@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: capistudio-api
+  datasource:
+    url: ${SUPABASE_DB_URL:}
+    username: ${SUPABASE_DB_USER:}
+    password: ${SUPABASE_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: never
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+otel:
+  service:
+    name: ${OTEL_SERVICE_NAME:capistudio-api}
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
+  exporter:
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}
+      protocol: ${OTEL_EXPORTER_OTLP_PROTOCOL:http/protobuf}
+
+logging:
+  level:
+    root: INFO
+    com.capistudio: INFO

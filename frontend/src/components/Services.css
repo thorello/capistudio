@@ -1,0 +1,19 @@
+.services {
+  background: var(--bg-secondary);
+}
+
+.service-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.service-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.service-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 1rem;
+}

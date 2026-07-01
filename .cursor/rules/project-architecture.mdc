@@ -1,0 +1,32 @@
+---
+description: Arquitetura padrão para novos projetos Capi Studio
+alwaysApply: true
+---
+
+# Arquitetura Padrão — Capi Studio
+
+Todo novo projeto deve iniciar com a seguinte stack:
+
+- **Hospedagem:** Render (`render.yaml`)
+- **Banco + Auth:** Supabase (`supabase/` com migrations)
+- **Observabilidade:** OpenTelemetry (OTLP export no backend)
+- **CI/CD:** GitHub Actions (`.github/workflows/`)
+
+## Checklist obrigatório ao iniciar projeto
+
+- [ ] `render.yaml` presente com serviços de API e frontend definidos
+- [ ] `backend/Dockerfile` para deploy da API
+- [ ] Pasta `supabase/` com `config.toml` e migrations SQL
+- [ ] `.env.example` com todas as variáveis (sem secrets reais)
+- [ ] OpenTelemetry configurado em `application.yml` com `OTEL_EXPORTER_OTLP_ENDPOINT`
+- [ ] `.github/workflows/ci.yml` — build e testes em PR/push
+- [ ] `.github/workflows/deploy.yml` — deploy automático para Render
+- [ ] `README.md` com setup local, deploy e configuração DNS
+- [ ] `.gitignore` cobrindo `.env`, `node_modules/`, `target/`
+
+## Convenções
+
+- Commits convencionais: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
+- Secrets nunca commitados — usar Render dashboard e GitHub Secrets
+- CORS configurado para domínios de produção e localhost
+- Health check em `/actuator/health` para serviços Render

@@ -1,0 +1,36 @@
+.portfolio-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.portfolio-thumb {
+  height: 160px;
+  width: 100%;
+}
+
+.portfolio-card h3,
+.portfolio-card p,
+.portfolio-category {
+  padding-inline: 1.75rem;
+}
+
+.portfolio-category {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gradient-end);
+}
+
+.portfolio-card h3 {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.portfolio-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  padding-bottom: 1.75rem;
+}

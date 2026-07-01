@@ -1,0 +1,25 @@
+.testimonials {
+  background: var(--bg-secondary);
+}
+
+.testimonial-quote {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.testimonial-card footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.testimonial-card footer strong {
+  font-size: 0.95rem;
+}
+
+.testimonial-card footer span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
