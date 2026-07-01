@@ -113,7 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error) throw error;
 
-    await validateSession(data.session);
+    const valid = await validateSession(data.session);
+    setSession(valid);
   }, []);
 
   const signOut = useCallback(async () => {
