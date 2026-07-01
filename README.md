@@ -93,6 +93,31 @@ docker compose up -d
    - `RENDER_DEPLOY_HOOK_API`
    - `RENDER_DEPLOY_HOOK_WEB`
 
+   **Passo a passo (Render):**
+   1. Abra [Render Dashboard](https://dashboard.render.com)
+   2. Clique em `capistudio-api` → **Settings** → **Deploy Hook**
+   3. Se não houver hook, clique em **Create Deploy Hook** e copie a URL (`https://api.render.com/deploy/srv-...`)
+   4. Repita para `capistudio-web`
+
+   **Passo a passo (GitHub):**
+   1. Abra [Secrets do repositório](https://github.com/thorello/capistudio/settings/secrets/actions)
+   2. **New repository secret** → nome `RENDER_DEPLOY_HOOK_API` → cole a URL da API
+   3. **New repository secret** → nome `RENDER_DEPLOY_HOOK_WEB` → cole a URL do frontend
+
+   **Script auxiliar (Windows):**
+   ```powershell
+   .\scripts\setup-render-hooks.ps1
+   ```
+   Com `GITHUB_TOKEN` e URLs definidas, grava os secrets automaticamente:
+   ```powershell
+   $env:RENDER_DEPLOY_HOOK_API = "https://api.render.com/deploy/srv-..."
+   $env:RENDER_DEPLOY_HOOK_WEB = "https://api.render.com/deploy/srv-..."
+   $env:GITHUB_TOKEN = "ghp_..."
+   .\scripts\setup-render-hooks.ps1 -Apply
+   ```
+
+   O workflow `Deploy` **falha** se algum secret estiver ausente (evita falso positivo de deploy).
+
 ## DNS (capistudio.com)
 
 O `render.yaml` já declara os domínios customizados (`capistudio.com` e `api.capistudio.com`). Após sincronizar o Blueprint no Render, configure o DNS no registrador.

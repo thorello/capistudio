@@ -12,18 +12,20 @@ jobs:
         env:
           DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_API }}
         run: |
-          if [ -n "$DEPLOY_HOOK" ]; then
-            curl -fsS -X POST "$DEPLOY_HOOK"
-          else
-            echo "RENDER_DEPLOY_HOOK_API not configured, skipping API deploy"
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::error::Secret RENDER_DEPLOY_HOOK_API não configurado. Veja README > Deploy no Render > Deploy Hooks."
+            exit 1
           fi
+          curl -fsS -X POST "$DEPLOY_HOOK"
+          echo "Deploy da API acionado."
 
       - name: Deploy Web to Render
         env:
           DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_WEB }}
         run: |
-          if [ -n "$DEPLOY_HOOK" ]; then
-            curl -fsS -X POST "$DEPLOY_HOOK"
-          else
-            echo "RENDER_DEPLOY_HOOK_WEB not configured, skipping web deploy"
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::error::Secret RENDER_DEPLOY_HOOK_WEB não configurado. Veja README > Deploy no Render > Deploy Hooks."
+            exit 1
           fi
+          curl -fsS -X POST "$DEPLOY_HOOK"
+          echo "Deploy do frontend acionado."
