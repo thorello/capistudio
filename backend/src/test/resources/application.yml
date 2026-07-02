@@ -11,6 +11,8 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema-test.sql
+  jooq:
+    sql-dialect: h2
 
 otel:
   traces:

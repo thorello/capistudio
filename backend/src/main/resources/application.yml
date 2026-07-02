@@ -12,6 +12,8 @@ spring:
   sql:
     init:
       mode: never
+  jooq:
+    sql-dialect: postgres
 
 server:
   port: ${PORT:8080}
