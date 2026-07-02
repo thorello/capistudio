@@ -1,69 +1,10 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getContactSubmissions, type ContactSubmission } from "../../lib/submissionsRepository";
+import { SubmissionCard } from "../../components/admin/SubmissionCard";
+import { useSubmissions } from "../../hooks/useSubmissions";
 import "./SubmissionsPage.css";
 
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
-}
-
-function SubmissionCard({ item }: { item: ContactSubmission }) {
-  const [expanded, setExpanded] = useState(false);
-  const long = item.message.length > 200;
-
-  return (
-    <article className="submission-card card">
-      <header className="submission-card-header">
-        <div className="submission-card-meta">
-          <span className="submission-name">{item.name}</span>
-          <a
-            href={`mailto:${item.email}`}
-            className="submission-email"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {item.email}
-          </a>
-        </div>
-        <time className="submission-date" dateTime={item.created_at}>
-          {formatDate(item.created_at)}
-        </time>
-      </header>
-
-      <p className={`submission-message${expanded || !long ? "" : " submission-message--truncated"}`}>
-        {item.message}
-      </p>
-
-      {long && (
-        <button
-          type="button"
-          className="submission-expand"
-          onClick={() => setExpanded((v) => !v)}
-        >
-          {expanded ? "Ver menos" : "Ver mais"}
-        </button>
-      )}
-    </article>
-  );
-}
-
 export function SubmissionsPage() {
-  const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    getContactSubmissions()
-      .then(setSubmissions)
-      .catch((err) => setError(err instanceof Error ? err.message : "Erro ao carregar mensagens."))
-      .finally(() => setLoading(false));
-  }, []);
+  const { submissions, loading, error } = useSubmissions();
 
   return (
     <div className="admin-layout">

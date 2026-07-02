@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { toErrorMessage } from "../../utils/toErrorMessage";
 import "./LoginPage.css";
 
 export function LoginPage() {
@@ -24,7 +25,7 @@ export function LoginPage() {
     try {
       await signInWithGoogle();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao entrar com Google.");
+      setError(toErrorMessage(err, "Erro ao entrar com Google."));
       setSubmitting(false);
     }
   }
@@ -37,7 +38,7 @@ export function LoginPage() {
     try {
       await signInWithEmail(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "E-mail ou senha inválidos.");
+      setError(toErrorMessage(err, "E-mail ou senha inválidos."));
     } finally {
       setSubmitting(false);
     }

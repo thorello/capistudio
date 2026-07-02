@@ -8,9 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { isAllowedAdminEmail } from "../lib/admin";
-import { validateAdminSession } from "../lib/adminAuthorization";
-import { supabase } from "../lib/supabase";
+import { useServices } from "../composition/ServicesContext";
 
 type AuthContextValue = {
   user: User | null;
@@ -24,91 +22,53 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { authService } = useServices();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
     let mounted = true;
 
-    supabase.auth.getSession().then(async ({ data: { session: current } }) => {
-      if (!mounted) return;
-
-      try {
-        const valid = await validateAdminSession(current);
-        setSession(valid);
-      } catch {
-        setSession(null);
-      } finally {
+    authService
+      .getSession()
+      .then((current) => {
+        if (mounted) setSession(current);
+      })
+      .catch(() => {
+        if (mounted) setSession(null);
+      })
+      .finally(() => {
         if (mounted) setLoading(false);
-      }
-    });
+      });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    const unsubscribe = authService.onAuthStateChange((nextSession) => {
       if (!mounted) return;
-
-      try {
-        const valid = await validateAdminSession(nextSession);
-        setSession(valid);
-      } catch {
-        setSession(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      setSession(nextSession);
+      setLoading(false);
     });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      unsubscribe();
     };
-  }, []);
+  }, [authService]);
 
   const signInWithGoogle = useCallback(async () => {
-    if (!supabase) {
-      throw new Error("Supabase não configurado.");
-    }
+    await authService.signInWithGoogle(`${window.location.origin}/admin`);
+  }, [authService]);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/admin`,
-      },
-    });
-
-    if (error) throw error;
-  }, []);
-
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
-    if (!supabase) {
-      throw new Error("Supabase não configurado.");
-    }
-
-    if (!isAllowedAdminEmail(email)) {
-      throw new Error("Este e-mail não tem permissão de administrador.");
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-
-    if (error) throw error;
-
-    const valid = await validateAdminSession(data.session);
-    setSession(valid);
-  }, []);
+  const signInWithEmail = useCallback(
+    async (email: string, password: string) => {
+      const validSession = await authService.signInWithEmail(email, password);
+      setSession(validSession);
+    },
+    [authService],
+  );
 
   const signOut = useCallback(async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    await authService.signOut();
     setSession(null);
-  }, []);
+  }, [authService]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -119,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithEmail,
       signOut,
     }),
-    [session, loading, signInWithGoogle, signInWithEmail, signOut]
+    [session, loading, signInWithGoogle, signInWithEmail, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

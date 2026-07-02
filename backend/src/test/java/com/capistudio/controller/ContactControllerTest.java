@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,7 +33,8 @@ class ContactControllerTest {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("success"));
+                .andExpect(jsonPath("$.status").value("success"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"));
     }
 
     @Test
@@ -44,6 +46,20 @@ class ContactControllerTest {
                                   "name": "Ana Silva",
                                   "email": "email-invalido",
                                   "message": "Olá, gostaria de saber mais."
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitContact_htmlInMessage_returns400() throws Exception {
+        mockMvc.perform(post("/api/contact")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Ana Silva",
+                                  "email": "ana@example.com",
+                                  "message": "Olá <script>alert(1)</script>"
                                 }
                                 """))
                 .andExpect(status().isBadRequest());

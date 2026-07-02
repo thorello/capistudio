@@ -1,34 +1,19 @@
-import { useState, type FormEvent } from "react";
-import { submitContact } from "../lib/contactApi";
+import { CONTACT_EMAIL } from "../config/appConfig";
+import { useContactForm } from "../hooks/useContactForm";
 import "./Contact.css";
 
-const CONTACT_EMAIL = "morello@capistudio.com";
-
 export function Contact() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    setStatus("loading");
-    setErrorMessage("");
-
-    try {
-      await submitContact({ name, email, message });
-      setStatus("success");
-      setName("");
-      setEmail("");
-      setMessage("");
-    } catch (error) {
-      setStatus("error");
-      setErrorMessage(
-        error instanceof Error ? error.message : "Erro ao enviar mensagem"
-      );
-    }
-  }
+  const {
+    name,
+    setName,
+    email,
+    setEmail,
+    message,
+    setMessage,
+    status,
+    errorMessage,
+    handleSubmit,
+  } = useContactForm();
 
   return (
     <section id="contato" className="section contact">

@@ -1,5 +1,5 @@
 -- Permite que usuários autenticados com e-mails de admin leiam as submissions.
--- Os e-mails autorizados devem coincidir com ALLOWED_ADMIN_EMAILS em frontend/src/lib/admin.ts.
+-- Os e-mails autorizados devem coincidir com EmailAllowListAdminPolicy em frontend/src/services/EmailAllowListAdminPolicy.ts.
 create policy "Admins can read contact submissions"
   on contact_submissions
   for select
